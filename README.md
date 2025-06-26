@@ -15,10 +15,10 @@ a novel time-distributed dual-transformer algorithm for large-scale insertions d
 
 ```
 #create
-conda create -n __your_environment_name__ python=3.9
+conda create -n your_environment_name python=3.9
 
 #activate
-conda activate __your_environment_name__
+conda activate your_environment_name
 ```
 
 ## 2. Package installation
@@ -43,7 +43,7 @@ python TTT_InsNet.py generate_feature bam_file output_path contigs_list(default:
 bam_file:the path of the alignment file about the reference and the long read set;    
 output_path:a folder which is used to store generated features data;  
 contigs_list:the list of contig to preform detection.(default: [], all contig are used);
-max_work is the number of threads to use;
+max_work:the number of threads to use;
 vcf_file:the gold standard file for standard data.
    
 eg:# python TTT_InsNet.py your_file_address/HG002_PB_5x_RG_HP10XtrioRTG.bam your_file_address/chr12-13 [12,13] 5 your_file_address/HG002_SVs_Tier1_v0.6.vcf.gz
@@ -52,16 +52,19 @@ eg:# python TTT_InsNet.py your_file_address/HG002_PB_5x_RG_HP10XtrioRTG.bam your
 ## 2.Call insertion
 
 ```
-python INSnet.py call_insertion insertion_predict_weight datapath bamfilepath outvcfpath support includecontig   
+python TTT_InsNet.py gpu_name save_length timesteps ins_predict_weight data_path bam_file out_vcf_file contigs support
+
+gpu_name:num of the GPU to use;
+save_length:the feature file spans across nucleotide base sequence lengths;
+timesteps:time step of time-distributed;
+ins_predict_weight:path of insert predict weight file;
+data_path:a folder for storing evaluation feature files;
+bam_file:path of the alignment file about the reference and the long read set;
+out_vcf_file:the path of output vcf file;
+contigs:the list of contig to preform detection.(default: [], all contig are used);
+support:min support reads.
    
-insertion_predict_weight is the path of the model weights;  
-datapath is a folder which is used to store evaluation data;  
-bamfilepath is the path of the alignment file about the reference and the long read set;  
-outvcfpath is the path of output vcf file;  
-support is min support reads;  
-includecontig is the list of contig to preform detection.(default: [], all contig are used)  
-   
-eg: python TTT_InsNet.py call_sv ./insertion_weights.h5(ccs_insertion_weights.h5) ./datapath ./long_read.bam ./outvcfpath 10 [12,13,14,15,16,17,18,19,20,21,22]
+python TTT_InsNet.py call_insertion '1, 2' 10000000 100 your_file/ins_predict_weight.pth your_file/data_path your_file/bam_file.bam your_file/out_vcf_file.vcf [12,13] 5
 ```
 
 # Tested data
