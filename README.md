@@ -38,14 +38,15 @@ cd TTT-InsNet
 ## 1.Produce data for call SV
 
 ```
-python INSnet.py generate_feature bamfile_path_long output_data_folder max_work(default:5) includecontig   
+python TTT_InsNet.py generate_feature bam_file output_path contigs_list(default:[](all chromosomes)) max_worker vcf_file
     
-bamfile_path_long is the path of the alignment file about the reference and the long read set;    
-output_data_folder is a folder which is used to store evaluation data;  
-max_work is the number of threads to use;  
-includecontig is the list of contig to preform detection.(default: [], all contig are used)  
+bam_file:the path of the alignment file about the reference and the long read set;    
+output_path:a folder which is used to store generated features data;  
+contigs_list:the list of contig to preform detection.(default: [], all contig are used);
+max_work is the number of threads to use;
+vcf_file:the gold standard file for standard data.
    
-eg: python TTT_InsNet.py generate_feature ./long_read.bam ./outpath 5 [12,13,14,15,16,17,18,19,20,21,22] 
+eg:# python TTT_InsNet.py your_file_address/HG002_PB_5x_RG_HP10XtrioRTG.bam your_file_address/chr12-13 [12,13] 5 your_file_address/HG002_SVs_Tier1_v0.6.vcf.gz
 ```
 
 ## 2.Call insertion
