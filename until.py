@@ -13,7 +13,7 @@ class CustomDataset(Dataset):
     def __init__(self, file_list, timesteps):
         self.file_list = file_list
         self.timesteps = timesteps
-        self.file_data = self.load_all_data()  # 预加载所有文件数据
+        self.file_data = self.load_all_data()
 
     def load_all_data(self):
         all_features = []
@@ -49,7 +49,7 @@ def collate_fn(batch, timesteps, batch_size):
     
     return torch.from_numpy(features).float(), torch.from_numpy(labels).float()
 
-# 使用 DataLoader 加载数据
+# DataLoader
 def get_data_loader(file_list, timesteps, batch_size, shuffle=False):
     dataset = CustomDataset(file_list, timesteps)
     data_loader = DataLoader(dataset, batch_size=batch_size * timesteps, shuffle=shuffle, collate_fn=lambda batch: collate_fn(batch, timesteps, batch_size), num_workers=4)
@@ -66,29 +66,23 @@ class EarlyStopping:
         self.early_stop = False
 
     def __call__(self, f1, model):
-        # 监控 F1 值
         if f1 > self.best_f1 + self.delta:
             self.best_f1 = f1
             self.counter_f1 = 0
         else:
             self.counter_f1 += 1
-
-        # 检查是否触发早停
         if self.counter_f1 >= self.patience:
             self.early_stop = True
             print(f"EarlyStopping triggered after {self.patience} epochs without improvement in F1.")
 
     def save_checkpoint(self, f1, model):
-        # 保存模型
         if f1 > self.best_f1:
             print(f"F1 value increased ({self.best_f1:.6f} --> {f1:.6f}). Saving model ...")
             torch.save(model.state_dict(), self.path)
             self.best_f1 = f1
 
 def calculate_metrics(y_true, y_pred):
-    """
-    计算 TP, FP, TN, FN, 准确率, 召回率, 精确率, F1 分数
-    """
+
     cm = confusion_matrix(y_true, y_pred)
     TN, FP, FN, TP = cm.ravel()
     
@@ -135,15 +129,14 @@ def train_fn(model, device, timesteps, train_loader, optimizer, loss_fn, train_l
                 continue  
         optimizer.zero_grad()
         # print(f'features_padding = {features_padding.shape}, labels_padding = {labels_padding.shape}')
-        outputs = model(features_padding)  # 输出形状：[batch_size, seq_len, 1]
+        outputs = model(features_padding)  # [batch_size, seq_len, 1]
         # print(f'outputs = {outputs.shape}')
-        loss = loss_fn(outputs.view(-1), labels_padding.view(-1)) # 计算损失
+        loss = loss_fn(outputs.view(-1), labels_padding.view(-1))
         loss.backward()
         optimizer.step()
         total_loss += loss.item()
-        
-        # 计算预测值
-        predicted = (torch.sigmoid(outputs)>0.5).float().view(-1, 1)  # 找到每个样本的预测类别
+
+        predicted = (torch.sigmoid(outputs)>0.5).float().view(-1, 1) 
         y_true.extend(labels_padding.cpu().numpy().flatten().astype(int))
         y_pred.extend(predicted.cpu().numpy().flatten().astype(int))
 
@@ -166,12 +159,6 @@ def valid_fn(model, device, timesteps, valid_loader, loss_fn, val_losses, val_ac
             features, labels = features.to(device), labels.to(device)
             remain = features.size(0) % (timesteps * 2)
             if remain != 0:
-                # padding_size = timesteps * 2 - remain
-                # patch_features = np.zeros((padding_size, 200, 5, 1))
-                # padding_labels = np.zeros((padding_size, 1))
-                # patch_features, padding_labels = torch.as_tensor(patch_features, dtype=torch.float32).to(device), torch.as_tensor(padding_labels, dtype=torch.float32).to(device)
-                # features_padding = torch.cat((features, patch_features), dim=0)
-                # labels_padding = torch.cat((labels, padding_labels), dim=0)
                 features_padding = features[:features.size(0) - remain]
                 labels_padding = labels[:labels.size(0) - remain]
             else:
