@@ -115,12 +115,6 @@ def train_fn(model, device, timesteps, train_loader, optimizer, loss_fn, train_l
         # print(f'features = {features.shape}, labels = {labels.shape}')
         remain = features.size(0) % (timesteps * 2)
         if remain != 0:
-            # padding_size = timesteps * 2 - remain
-            # patch_features = np.zeros((padding_size, 200, 5, 1))
-            # padding_labels = np.zeros((padding_size, 1))
-            # patch_features, padding_labels = torch.as_tensor(patch_features, dtype=torch.float32).to(device), torch.as_tensor(padding_labels, dtype=torch.float32).to(device) 
-            # features_padding = torch.cat((features, patch_features), dim=0)
-            # labels_padding = torch.cat((labels, padding_labels), dim=0)
             features_padding = features[:features.size(0) - remain]
             labels_padding = labels[:labels.size(0) - remain]
         else:
