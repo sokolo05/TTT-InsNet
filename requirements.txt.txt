@@ -1,0 +1,4 @@
+torch==2.5
+pandas==2.2.3
+pysam==0.23.0
+torchvision==0.20.0
